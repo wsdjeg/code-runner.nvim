@@ -92,7 +92,7 @@ local function open_win()
   vim.cmd('resize ' .. lines)
   vim.cmd([[
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonu norelativenumber winfixheight nomodifiable
-  set filetype=SpaceVimRunner
+  set filetype=nvim-code-runner
   ]])
   vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', 'q', '', {
     callback = close_win,

@@ -7,6 +7,8 @@ local job = require("code-runner.job")
 local util = require("code-runner.utils")
 local nt = require("spacevim.api.notify")
 
+local enter_win = false
+
 local code_runner_bufnr = 0
 
 local winid = -1
@@ -106,7 +108,7 @@ local function open_win()
 		callback = stop_runner,
 	})
 	winid = vim.api.nvim_get_current_win()
-	if vim.g.spacevim_code_runner_focus == 0 then
+	if not enter_win then
 		vim.api.nvim_set_current_win(previous_wind)
 	end
 end
@@ -665,6 +667,7 @@ function M.setup(opt)
 			runners[ft] = runner
 		end
 	end
+    enter_win = opt.enter
 end
 
 return M

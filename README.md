@@ -10,13 +10,17 @@ With nvim-plug:
 require('plug').add({
   {
     'wsdjeg/code-runner.nvim',
-    config = function()
-      require('code-runner').setup({
-        runners = {
-          lua = { exe = 'lua', opt = { '-' }, usestdin = true },
-        },
-      })
-    end,
   },
+})
+```
+
+## Setup
+
+```lua
+require("code-runner").setup({
+	runners = {
+		lua = { exe = "lua", opt = { "-" }, usestdin = true },
+	},
+    enter_win = false,
 })
 ```

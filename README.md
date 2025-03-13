@@ -40,3 +40,8 @@ lua require('code-runner').open()
 ```
 lua require('code-runner').open('make test')
 ```
+
+## APIs
+
+- `close()`: close code runner window
+- `get(ft)`: get default runner for specific filetype

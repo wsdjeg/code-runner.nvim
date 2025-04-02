@@ -9,10 +9,13 @@ Async Code Runner for Neovim
 With nvim-plug:
 
 ```lua
-require('plug').add({
-  {
-    'wsdjeg/code-runner.nvim',
-  },
+require("plug").add({
+	{
+		"wsdjeg/code-runner.nvim",
+		depends = {
+			{ "wsdjeg/job.nvim" },
+		},
+	},
 })
 ```
 

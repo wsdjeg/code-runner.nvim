@@ -3,7 +3,7 @@ local M = {}
 local runners = {}
 
 local logger = require("code-runner.logger")
-local job = require("code-runner.job")
+local job = require("job")
 local util = require("code-runner.utils")
 local nt = require("spacevim.api.notify")
 
@@ -667,7 +667,7 @@ function M.setup(opt)
 			runners[ft] = runner
 		end
 	end
-    enter_win = opt.enter
+	enter_win = opt.enter
 end
 
 return M

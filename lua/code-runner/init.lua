@@ -5,7 +5,7 @@ local runners = {}
 local logger = require("code-runner.logger")
 local job = require("job")
 local util = require("code-runner.utils")
-local nt = require("spacevim.api.notify")
+local nt = require("notify")
 
 local enter_win = false
 

@@ -14,6 +14,7 @@ require("plug").add({
 		"wsdjeg/code-runner.nvim",
 		depends = {
 			{ "wsdjeg/job.nvim" },
+			{ "wsdjeg/notify.nvim" },
 		},
 	},
 })

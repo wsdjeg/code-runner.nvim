@@ -4,7 +4,16 @@ Async Code Runner for Neovim
 
 ![Image](https://github.com/user-attachments/assets/e8a3d6e8-59ee-41b1-bb19-be0a1d3d997f)
 
-## Install
+<!-- vim-markdown-toc GFM -->
+
+* [Installation](#installation)
+* [Setup](#setup)
+* [Usage](#usage)
+* [APIs](#apis)
+
+<!-- vim-markdown-toc -->
+
+## Installation
 
 With nvim-plug:
 
@@ -27,7 +36,7 @@ require("code-runner").setup({
 	runners = {
 		lua = { exe = "lua", opt = { "-" }, usestdin = true },
 	},
-    enter_win = false,
+	enter_win = false,
 })
 ```
 

@@ -165,7 +165,7 @@ local function on_exit(id, code, single)
 	local done =
 		{
 			"",
-			"[Done] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
+			"[Running Done] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
 				vim.fn.reltimestr(end_time)
 			) .. " seconds",
 		}
@@ -216,7 +216,7 @@ local function on_compile_exit(id, code, single)
 		runner_status.exit_single = single
 		local done = {
 			"",
-			"[Done] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
+			"[Compile failed] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
 				vim.fn.reltimestr(end_time)
 			) .. " seconds",
 		}
@@ -323,6 +323,7 @@ local function async_run(runner, ...)
 			type(compile_cmd) == "string"
 			or type(compile_cmd) == "table" and vim.fn.executable(compile_cmd[1] or "") == 1
 		then
+            log.debug('compile_cmd is:' .. vim.inspect(compile_cmd))
 			runner_jobid = job.start(compile_cmd, {
 				on_stdout = on_stdout,
 				on_stderr = on_stderr,

@@ -1,16 +1,16 @@
 local M = {}
-
-function M.info(msg)
-        
+local logger
+for _, f in ipairs({ 'info', 'debug', 'warn', 'error' }) do
+    M[f] = function(msg)
+        if not logger then
+            pcall(function()
+                logger = require('logger').derive('code-runner')
+                logger[f](msg)
+            end)
+        else
+            logger[f](msg)
+        end
+    end
 end
-
-function M.warn(msg)
-        
-end
-
-function M.debug(msg)
-        
-end
-
 
 return M

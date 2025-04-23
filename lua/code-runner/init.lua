@@ -323,7 +323,7 @@ local function async_run(runner, ...)
 			type(compile_cmd) == "string"
 			or type(compile_cmd) == "table" and vim.fn.executable(compile_cmd[1] or "") == 1
 		then
-            log.debug('compile_cmd is:' .. vim.inspect(compile_cmd))
+            logger.debug('compile_cmd is:' .. vim.inspect(compile_cmd))
 			runner_jobid = job.start(compile_cmd, {
 				on_stdout = on_stdout,
 				on_stderr = on_stderr,

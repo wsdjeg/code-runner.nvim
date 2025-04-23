@@ -333,7 +333,6 @@ local function async_run(runner, ...)
 				local range = runner[1].range or { 1, "$" }
 				job.send(runner_jobid, vim.fn.getline(unpack(range)))
 				job.chanclose(runner_jobid, "stdin")
-				job.stop(runner_jobid)
 			end
 		else
 			local exe = compile_cmd[1] or ""

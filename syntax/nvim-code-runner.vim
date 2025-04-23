@@ -1,4 +1,4 @@
-if exists('b:current_syntax') && b:current_syntax ==# 'SpaceVimRunner'
+if exists('b:current_syntax') && b:current_syntax ==# 'nvim-code-runner'
   finish
 endif
 let b:current_syntax = 'nvim-code-runner'
@@ -14,7 +14,7 @@ syn match DoneFailed /\[Done]\(\ exited\ with\ code=0, single=[^0]\)\@=/
 syn match ExitCode /\(\[Done\]\ exited\ with \)\@<=code=0/
 syn match ExitCodeFailed /\(\[Done\]\ exited\ with \)\@<=code=[1-9]\d*/
 syn match SingleCode /single=0/
-syn match SingleCodeFailed /single=[^0]/
+syn match SingleCodeFailed /single=[^0]\d*/
 
 hi def link RunnerCmd Comment
 hi def link KeyBindings String

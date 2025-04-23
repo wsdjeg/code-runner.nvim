@@ -165,7 +165,7 @@ local function on_exit(id, code, single)
 	local done =
 		{
 			"",
-			"[Running Done] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
+			"[Done] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
 				vim.fn.reltimestr(end_time)
 			) .. " seconds",
 		}
@@ -216,7 +216,7 @@ local function on_compile_exit(id, code, single)
 		runner_status.exit_single = single
 		local done = {
 			"",
-			"[Compile failed] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
+			"[Done] exited with code=" .. code .. ", single=" .. single .. " in " .. util.trim(
 				vim.fn.reltimestr(end_time)
 			) .. " seconds",
 		}

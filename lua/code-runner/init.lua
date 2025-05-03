@@ -396,7 +396,6 @@ local function async_run(runner, ...)
 				end
 				job.send(runner_jobid, text)
 				job.chanclose(runner_jobid, "stdin")
-				job.stop(runner_jobid)
 			end
 		else
 			local exe = cmd[1] or ""

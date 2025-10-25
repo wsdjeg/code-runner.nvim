@@ -90,14 +90,14 @@ local function open_win()
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonu norelativenumber winfixheight nomodifiable
   set filetype=nvim-code-runner
   ]])
-    vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', 'q', '', {
-        callback = close_win,
+    vim.keymap.set('n', 'q', close_win, {
+        buffer = code_runner_bufnr,
     })
-    vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', 'i', '', {
-        callback = insert,
+    vim.keymap.set('n', 'i', insert, {
+        buffer = code_runner_bufnr,
     })
-    vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', '<C-c>', '', {
-        callback = stop_runner,
+    vim.keymap.set('n', '<C-c>', stop_runner, {
+        buffer = code_runner_bufnr,
     })
     local id = vim.api.nvim_create_augroup('spacevim_runner', {
         clear = true,

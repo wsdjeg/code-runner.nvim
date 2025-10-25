@@ -58,7 +58,7 @@ end
 local function close_win()
     stop_runner()
     if code_runner_bufnr ~= 0 and vim.api.nvim_buf_is_valid(code_runner_bufnr) then
-        vim.cmd('bd ' .. code_runner_bufnr)
+        vim.cmd.bdelete(code_runner_bufnr)
     end
 end
 
@@ -85,19 +85,19 @@ local function open_win()
     vim.cmd('botright split __runner__')
     code_runner_bufnr = vim.fn.bufnr('%')
     local lines = vim.o.lines * 30 / 100
-    vim.cmd('resize ' .. lines)
+    vim.cmd.resize(lines)
     vim.cmd([[
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonu norelativenumber winfixheight nomodifiable
   set filetype=nvim-code-runner
   ]])
-    vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', 'q', '', {
-        callback = close_win,
+    vim.keymap.set('n', 'q', close_win, {
+        buffer = code_runner_bufnr,
     })
-    vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', 'i', '', {
-        callback = insert,
+    vim.keymap.set('n', 'i', insert, {
+        buffer = code_runner_bufnr,
     })
-    vim.api.nvim_buf_set_keymap(code_runner_bufnr, 'n', '<C-c>', '', {
-        callback = stop_runner,
+    vim.keymap.set('n', '<C-c>', stop_runner, {
+        buffer = code_runner_bufnr,
     })
     local id = vim.api.nvim_create_augroup('spacevim_runner', {
         clear = true,
@@ -120,7 +120,7 @@ local function extend(t1, t2)
 end
 
 local function update_statusline()
-    vim.cmd('redrawstatus!')
+    vim.cmd.redrawstatus({ bang = true })
 end
 
 local function on_stdout(id, data, event)
@@ -128,9 +128,9 @@ local function on_stdout(id, data, event)
         return
     end
     if vim.api.nvim_buf_is_valid(code_runner_bufnr) then
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
         vim.api.nvim_buf_set_lines(code_runner_bufnr, runner_lines, runner_lines + 1, false, data)
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+        vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         runner_lines = runner_lines + #data
         if winid >= 0 then
             vim.api.nvim_win_set_cursor(
@@ -147,9 +147,9 @@ local function on_stderr(id, data, event)
     end
     runner_status.has_errors = true
     if vim.api.nvim_buf_is_valid(code_runner_bufnr) then
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
         vim.api.nvim_buf_set_lines(code_runner_bufnr, runner_lines, runner_lines + 1, false, data)
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+        vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         runner_lines = runner_lines + #data
         if winid >= 0 then
             vim.api.nvim_win_set_cursor(
@@ -175,9 +175,9 @@ local function on_exit(id, code, single)
         ) .. ' seconds',
     }
     if vim.api.nvim_buf_is_valid(code_runner_bufnr) then
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
         vim.api.nvim_buf_set_lines(code_runner_bufnr, runner_lines, runner_lines + 1, false, done)
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+        vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         if winid >= 0 then
             vim.api.nvim_win_set_cursor(
                 winid,
@@ -229,7 +229,7 @@ local function on_compile_exit(id, code, single)
             ) .. ' seconds',
         }
         if vim.api.nvim_buf_is_valid(code_runner_bufnr) then
-            vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+            vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
             vim.api.nvim_buf_set_lines(
                 code_runner_bufnr,
                 runner_lines,
@@ -237,7 +237,7 @@ local function on_compile_exit(id, code, single)
                 false,
                 done
             )
-            vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+            vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
             if winid >= 0 then
                 vim.api.nvim_win_set_cursor(
                     winid,
@@ -262,7 +262,7 @@ local function async_run(runner, ...)
             cmd = vim.fn.printf(runner, f)
         end)
         logger.info('   cmd:' .. cmd)
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
         vim.api.nvim_buf_set_lines(
             code_runner_bufnr,
             runner_lines,
@@ -270,7 +270,7 @@ local function async_run(runner, ...)
             false,
             { '[Running] ' .. cmd, '', vim.fn['repeat']('-', 20) }
         )
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+        vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         runner_lines = runner_lines + 3
         start_time = vim.fn.reltime()
         local opts = select(1, ...) or {}
@@ -324,20 +324,14 @@ local function async_run(runner, ...)
             end
         end
 
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
-        vim.api.nvim_buf_set_lines(
-            code_runner_bufnr,
-            runner_lines,
-            -1,
-            false,
-            {
-                '[Compile] ' .. compile_cmd_info,
-                '[Running] ' .. target,
-                '',
-                vim.fn['repeat']('-', 20),
-            }
-        )
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
+        vim.api.nvim_buf_set_lines(code_runner_bufnr, runner_lines, -1, false, {
+            '[Compile] ' .. compile_cmd_info,
+            '[Running] ' .. target,
+            '',
+            vim.fn['repeat']('-', 20),
+        })
+        vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
 
         runner_lines = runner_lines + 4
         start_time = vim.fn.reltime()
@@ -358,7 +352,7 @@ local function async_run(runner, ...)
             end
         else
             local exe = compile_cmd[1] or ''
-            vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+            vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
             vim.api.nvim_buf_set_lines(
                 code_runner_bufnr,
                 runner_lines,
@@ -366,7 +360,7 @@ local function async_run(runner, ...)
                 false,
                 { exe .. ' is not executable, make sure ' .. exe .. ' is in your PATH' }
             )
-            vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+            vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         end
     elseif type(runner) == 'table' then
         local cmd = {}
@@ -389,7 +383,7 @@ local function async_run(runner, ...)
         if usestdin then
             running_command = running_command .. ' STDIN'
         end
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
         vim.api.nvim_buf_set_lines(
             code_runner_bufnr,
             runner_lines,
@@ -397,7 +391,7 @@ local function async_run(runner, ...)
             false,
             { '[Running] ' .. running_command, '', vim.fn['repeat']('-', 20) }
         )
-        vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+        vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         runner_lines = runner_lines + 3
         start_time = vim.fn.reltime()
         if vim.fn.empty(cmd) == 0 and vim.fn.executable(cmd[1]) == 1 then
@@ -421,7 +415,7 @@ local function async_run(runner, ...)
             end
         else
             local exe = cmd[1] or ''
-            vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', true)
+            vim.api.nvim_set_option_value('modifiable', true, { buf = code_runner_bufnr })
             vim.api.nvim_buf_set_lines(
                 code_runner_bufnr,
                 runner_lines,
@@ -429,7 +423,7 @@ local function async_run(runner, ...)
                 false,
                 { exe .. ' is not executable, make sure ' .. exe .. ' is in your PATH' }
             )
-            vim.api.nvim_buf_set_option(code_runner_bufnr, 'modifiable', false)
+            vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
         end
     end
 
@@ -567,7 +561,7 @@ local function match_problems(output, matcher)
             end
         end
         vim.fn.setqflist({}, 'r', { title = ' task output', items = items })
-        vim.cmd('copen')
+        vim.cmd.copen()
     else
         local olderrformat = vim.o.errorformat
         pcall(function()
@@ -575,7 +569,7 @@ local function match_problems(output, matcher)
             vim.g._spacevim_task_output = output
             vim.cmd('noautocmd cexpr g:_spacevim_task_output')
             vim.fn.setqflist({}, 'a', { title = ' task output' })
-            vim.cmd('copen')
+            vim.cmd.copen()
             vim.g._spacevim_task_output = nil
         end)
         vim.o.errorformat = olderrformat

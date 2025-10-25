@@ -58,7 +58,7 @@ end
 local function close_win()
     stop_runner()
     if code_runner_bufnr ~= 0 and vim.api.nvim_buf_is_valid(code_runner_bufnr) then
-        vim.cmd('bd ' .. code_runner_bufnr)
+        vim.cmd.bdelete(code_runner_bufnr)
     end
 end
 
@@ -85,7 +85,7 @@ local function open_win()
     vim.cmd('botright split __runner__')
     code_runner_bufnr = vim.fn.bufnr('%')
     local lines = vim.o.lines * 30 / 100
-    vim.cmd('resize ' .. lines)
+    vim.cmd.resize(lines)
     vim.cmd([[
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonu norelativenumber winfixheight nomodifiable
   set filetype=nvim-code-runner
@@ -120,7 +120,7 @@ local function extend(t1, t2)
 end
 
 local function update_statusline()
-    vim.cmd('redrawstatus!')
+    vim.cmd.redrawstatus({ bang = true })
 end
 
 local function on_stdout(id, data, event)
@@ -561,7 +561,7 @@ local function match_problems(output, matcher)
             end
         end
         vim.fn.setqflist({}, 'r', { title = ' task output', items = items })
-        vim.cmd('copen')
+        vim.cmd.copen()
     else
         local olderrformat = vim.o.errorformat
         pcall(function()
@@ -569,7 +569,7 @@ local function match_problems(output, matcher)
             vim.g._spacevim_task_output = output
             vim.cmd('noautocmd cexpr g:_spacevim_task_output')
             vim.fn.setqflist({}, 'a', { title = ' task output' })
-            vim.cmd('copen')
+            vim.cmd.copen()
             vim.g._spacevim_task_output = nil
         end)
         vim.o.errorformat = olderrformat

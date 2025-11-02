@@ -84,7 +84,7 @@ local function open_win()
     local previous_wind = vim.api.nvim_get_current_win()
     vim.cmd('botright split __runner__')
     code_runner_bufnr = vim.fn.bufnr('%')
-    local lines = vim.o.lines * 30 / 100
+    local lines = math.floor(vim.o.lines * 30 / 100)
     vim.cmd.resize(lines)
     vim.cmd([[
   setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonu norelativenumber winfixheight nomodifiable

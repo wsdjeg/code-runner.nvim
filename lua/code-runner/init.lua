@@ -9,7 +9,7 @@ local nt = require('notify')
 
 local enter_win = false
 
-local code_runner_bufnr = 0
+local code_runner_bufnr = -1
 
 local winid = -1
 
@@ -39,8 +39,6 @@ local task_stdout = {}
 local task_stderr = {}
 
 local task_problem_matcher = {}
-
-local selected_language = ''
 
 local function stop_runner()
     if runner_status.is_running then
@@ -81,15 +79,25 @@ local function open_win()
         return
     end
     logger.debug('open code runner windows')
-    local previous_wind = vim.api.nvim_get_current_win()
-    vim.cmd('botright split __runner__')
-    code_runner_bufnr = vim.fn.bufnr('%')
+    if not vim.api.nvim_buf_is_valid(code_runner_bufnr) then
+        code_runner_bufnr = vim.api.nvim_create_buf(false, true)
+    end
+    winid = vim.api.nvim_open_win(code_runner_bufnr, enter_win, { split = 'below' })
     local lines = math.floor(vim.o.lines * 30 / 100)
-    vim.cmd.resize(lines)
-    vim.cmd([[
-  setlocal buftype=nofile bufhidden=wipe nobuflisted nolist noswapfile nowrap cursorline nospell nonu norelativenumber winfixheight nomodifiable
-  set filetype=nvim-code-runner
-  ]])
+    vim.api.nvim_win_set_height(winid, lines)
+    vim.api.nvim_set_option_value('buftype', 'nofile', { buf = code_runner_bufnr })
+    vim.api.nvim_set_option_value('filetype', 'nvim-code-runner', { buf = code_runner_bufnr })
+    vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = code_runner_bufnr })
+    vim.api.nvim_set_option_value('swapfile', false, { buf = code_runner_bufnr })
+    vim.api.nvim_set_option_value('buflisted', false, { buf = code_runner_bufnr })
+    vim.api.nvim_set_option_value('modifiable', false, { buf = code_runner_bufnr })
+    vim.api.nvim_set_option_value('list', false, { win = winid })
+    vim.api.nvim_set_option_value('wrap', false, { win = winid })
+    vim.api.nvim_set_option_value('cursorline', true, { win = winid })
+    vim.api.nvim_set_option_value('spell', false, { win = winid })
+    vim.api.nvim_set_option_value('number', false, { win = winid })
+    vim.api.nvim_set_option_value('relativenumber', false, { win = winid })
+    vim.api.nvim_set_option_value('winfixheight', true, { win = winid })
     vim.keymap.set('n', 'q', close_win, {
         buffer = code_runner_bufnr,
     })
@@ -107,10 +115,6 @@ local function open_win()
         buffer = code_runner_bufnr,
         callback = stop_runner,
     })
-    winid = vim.api.nvim_get_current_win()
-    if not enter_win then
-        vim.api.nvim_set_current_win(previous_wind)
-    end
 end
 
 local function extend(t1, t2)
@@ -123,7 +127,7 @@ local function update_statusline()
     vim.cmd.redrawstatus({ bang = true })
 end
 
-local function on_stdout(id, data, event)
+local function on_stdout(id, data)
     if id ~= runner_jobid then
         return
     end
@@ -141,7 +145,7 @@ local function on_stdout(id, data, event)
         update_statusline()
     end
 end
-local function on_stderr(id, data, event)
+local function on_stderr(id, data)
     if id ~= runner_jobid then
         return
     end

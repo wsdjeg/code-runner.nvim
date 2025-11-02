@@ -373,9 +373,9 @@ local function async_run(runner, ...)
         cmd = merge_list(cmd, runner.opt)
         if not usestdin then
             if selected_file == '' then
-                cmd = merge_list(cmd, vim.fn.bufname('%'))
+                cmd = merge_list(cmd, { vim.fn.bufname('%') })
             else
-                cmd = merge_list(cmd, selected_file)
+                cmd = merge_list(cmd, { selected_file })
             end
         end
         logger.info('   cmd:' .. vim.inspect(cmd))

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/wsdjeg/code-runner.nvim/compare/v1.0.0...v1.1.0) (2025-11-23)
+
+
+### Features
+
+* add luarocks support ([5a9647d](https://github.com/wsdjeg/code-runner.nvim/commit/5a9647df814383aabb422b3e3bc1db160efc51b8))
+* use api functions instead of vim.cmd ([0975117](https://github.com/wsdjeg/code-runner.nvim/commit/0975117d928216a3a2218ce764caf409c5755704))
+
+
+### Bug Fixes
+
+* fix merge_list arguments ([29db7ed](https://github.com/wsdjeg/code-runner.nvim/commit/29db7ed7517a31cd0d873013bfeaa99b4768fca7))
+* fix resize line type ([400283b](https://github.com/wsdjeg/code-runner.nvim/commit/400283ba752ef48c62d1ec58702f9dacfe56ef4a))
+
 ## 1.0.0 (2025-10-25)
 
 

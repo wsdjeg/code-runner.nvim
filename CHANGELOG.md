@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/wsdjeg/code-runner.nvim/compare/v1.1.0...v1.1.1) (2025-12-03)
+
+
+### Bug Fixes
+
+* update release-please-action ([d05ce1f](https://github.com/wsdjeg/code-runner.nvim/commit/d05ce1fc768ad8868bb1330f5eb88b7ce01d6fcf))
+
 ## [1.1.0](https://github.com/wsdjeg/code-runner.nvim/compare/v1.0.0...v1.1.0) (2025-11-23)
 
 

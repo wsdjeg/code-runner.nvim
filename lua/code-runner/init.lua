@@ -212,6 +212,7 @@ local function on_compile_exit(id, code, single)
             on_stdout = on_stdout,
             on_stderr = on_stderr,
             on_exit = on_exit,
+            text = true,
         })
         if runner_jobid > 0 then
             runner_status = {
@@ -282,6 +283,7 @@ local function async_run(runner, ...)
             on_stdout = on_stdout,
             on_stderr = on_stderr,
             on_exit = on_exit,
+            text = true,
         })
         runner_jobid = job.start(cmd, opts)
     elseif type(runner) == 'table' and #runner == 2 then
@@ -348,6 +350,7 @@ local function async_run(runner, ...)
                 on_stdout = on_stdout,
                 on_stderr = on_stderr,
                 on_exit = on_compile_exit,
+                text = true,
             })
             if usestdin and runner_jobid > 0 then
                 local range = runner[1].range or { 1, '$' }
@@ -403,6 +406,8 @@ local function async_run(runner, ...)
                 on_stdout = on_stdout,
                 on_stderr = on_stderr,
                 on_exit = on_exit,
+                text = true,
+                encoding = runner.encoding,
             })
             if usestdin and runner_jobid > 0 then
                 local range = runner.range or { 1, '$' }
@@ -641,6 +646,8 @@ local function run_backgroud(cmd, ...)
     opts.on_stdout = on_backgroud_stdout
     opts.on_stderr = on_backgroud_stderr
     opts.on_exit = on_backgroud_exit
+    opts.text = opts.text or true
+    opts.encoding = opts.encoding
     local task_id = job.start(cmd, opts)
     task_problem_matcher =
         tbl_extend(task_problem_matcher, { ['task' .. task_id] = problemMatcher })

@@ -16,6 +16,10 @@ Async Code Runner for Neovim
 - [Setup](#setup)
 - [Usage](#usage)
 - [Runner Options](#runner-options)
+    - [exe](#exe)
+    - [opt](#opt)
+    - [usestdin](#usestdin)
+    - [range](#range)
     - [transform](#transform)
 - [APIs](#apis)
 
@@ -70,6 +74,63 @@ lua require('code-runner').open('make test')
 
 ## Runner Options
 
+### exe
+
+The `exe` option accepts a string, table, or function.
+When it is a `string` or `table`, it is passed directly to `job.start` as the job command.
+When it is a function, the function is executed first,
+and its return value is then used as the command to start the job.
+
+example:
+
+```lua
+require('code-runner').setup({
+    runners = {
+        lua = {
+            exe = function()
+                if vim.fn.executable('luajit') == 1 then
+                    return 'luajit'
+                elseif vim.fn.executable('lua') == 1 then
+                    return 'lua'
+                else
+                    return { 'nvim', '-l' }
+                end
+            end,
+            opt = { '-' },
+            usestdin = true,
+        },
+    },
+})
+```
+
+### opt
+
+job command arguments which will be appended to job commands.
+
+### usestdin
+
+if usestdin is true, then runner use context in current buffer as stdin instead of using file name.
+
+### range
+
+if usestdin is true, then code-runner.nvim use `vim.fn.getline(runner.range[1], runner.range[2])` as default stdin, the default range is `{1, '$'})`.
+This option is useful when run code block in markdown.
+
+`ftplugin/markdown.lua`
+
+```lua
+vim.keymap.set('n', '<leader>lr', function()
+    local cf = vim.fn['context_filetype#get']()
+
+    if cf.filetype ~= 'markdown' then
+        local runner = require('code-runner').get(cf.filetype)
+        runner['usestdin'] = true
+        runner['range'] = { cf['range'][1][1], cf['range'][2][1] }
+        require('code-runner').open(runner)
+    end
+end, { silent = true, buffer = true })
+```
+
 ### transform
 
 To replace text in output, use transform option, this should be a function which accept one string argument and return a string.
@@ -83,7 +144,7 @@ require('code-runner').setup({
             exe = 'lua',
             opt = { '-' },
             usestdin = true,
-            transform = function(lien)
+            transform = function(line)
                 return '[Lua output]' .. line
             end,
         },
@@ -91,8 +152,8 @@ require('code-runner').setup({
 })
 ```
 
-
 ## APIs
 
 - `close()`: close code runner window
+- `get(ft)`: get default runner for specific filetype
 - `get(ft)`: get default runner for specific filetype

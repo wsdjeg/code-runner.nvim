@@ -120,6 +120,7 @@ This option is useful when run code block in markdown.
 
 ```lua
 vim.keymap.set('n', '<leader>lr', function()
+    -- require https://github.com/Shougo/context_filetype.vim
     local cf = vim.fn['context_filetype#get']()
 
     if cf.filetype ~= 'markdown' then

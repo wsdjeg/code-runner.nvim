@@ -15,6 +15,8 @@ Async Code Runner for Neovim
 - [Installation](#installation)
 - [Setup](#setup)
 - [Usage](#usage)
+- [Runner Options](#runner-options)
+    - [transform](#transform)
 - [APIs](#apis)
 
 <!-- vim-markdown-toc -->
@@ -65,6 +67,30 @@ lua require('code-runner').open()
 ```
 lua require('code-runner').open('make test')
 ```
+
+## Runner Options
+
+### transform
+
+To replace text in output, use transform option, this should be a function which accept one string argument and return a string.
+
+for example:
+
+```lua
+require('code-runner').setup({
+    runners = {
+        lua = {
+            exe = 'lua',
+            opt = { '-' },
+            usestdin = true,
+            transform = function(lien)
+                return '[Lua output]' .. line
+            end,
+        },
+    },
+})
+```
+
 
 ## APIs
 

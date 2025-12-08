@@ -402,13 +402,33 @@ local function async_run(runner, ...)
         runner_lines = runner_lines + 3
         start_time = vim.fn.reltime()
         if vim.fn.empty(cmd) == 0 and vim.fn.executable(cmd[1]) == 1 then
-            runner_jobid = job.start(cmd, {
-                on_stdout = on_stdout,
-                on_stderr = on_stderr,
-                on_exit = on_exit,
-                text = true,
-                encoding = runner.encoding,
-            })
+            if runner.transform then
+                runner_jobid = job.start(cmd, {
+                    on_stdout = function(id, data)
+                        data = vim.tbl_map(function(t)
+                            return runner.transform(t)
+                        end, data)
+                        on_stdout(id, data)
+                    end,
+                    on_stderr = function(id, data)
+                        data = vim.tbl_map(function(t)
+                            return runner.transform(t)
+                        end, data)
+                        on_stderr(id, data)
+                    end,
+                    on_exit = on_exit,
+                    text = true,
+                    encoding = runner.encoding,
+                })
+            else
+                runner_jobid = job.start(cmd, {
+                    on_stdout = on_stdout,
+                    on_stderr = on_stderr,
+                    on_exit = on_exit,
+                    text = true,
+                    encoding = runner.encoding,
+                })
+            end
             if usestdin and runner_jobid > 0 then
                 local range = runner.range or { 1, '$' }
                 -- if selected file is not empty
@@ -499,7 +519,7 @@ function M.select_file()
         exit_single = 0,
     }
 
-    if vim.loop.os_uname().sysname == 'Windows_NT' then
+    if vim.uv.os_uname().sysname == 'Windows_NT' then
         -- what the fuck, why need trim?
         -- because powershell comamnd output has `\n` at the end, and filetype detection failed.
         selected_file = util.trim(vim.fn.system({
@@ -585,7 +605,7 @@ local function match_problems(output, matcher)
     end
 end
 
-local function on_backgroud_stdout(id, data, event)
+local function on_backgroud_stdout(id, data)
     local d = task_stdout['task' .. id] or {}
 
     for _, v in ipairs(data) do
@@ -595,7 +615,7 @@ local function on_backgroud_stdout(id, data, event)
     task_stdout['task' .. id] = d
 end
 
-local function on_backgroud_stderr(id, data, event)
+local function on_backgroud_stderr(id, data)
     local d = task_stderr['task' .. id] or {}
 
     for _, v in ipairs(data) do
@@ -628,6 +648,8 @@ local function on_backgroud_exit(id, code, single)
     nt.notify(
         'task finished with code='
             .. code
+            .. ' single='
+            .. single
             .. ' in '
             .. util.trim(vim.fn.reltimestr(end_time))
             .. ' seconds'

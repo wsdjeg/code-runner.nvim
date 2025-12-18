@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/wsdjeg/code-runner.nvim/compare/v1.1.0...v1.2.0) (2025-12-18)
+
+
+### Features
+
+* support output transform ([0a2e00d](https://github.com/wsdjeg/code-runner.nvim/commit/0a2e00d8d7973fb267a1395cdf8317eb243c0730))
+* support runner encoding and handle as text ([ade95a7](https://github.com/wsdjeg/code-runner.nvim/commit/ade95a7260f49248b9dd0126dd797668dda64f5e))
+
+
+### Bug Fixes
+
+* update release-please-action ([d05ce1f](https://github.com/wsdjeg/code-runner.nvim/commit/d05ce1fc768ad8868bb1330f5eb88b7ce01d6fcf))
+
 ## [1.1.0](https://github.com/wsdjeg/code-runner.nvim/compare/v1.0.0...v1.1.0) (2025-11-23)
 
 

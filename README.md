@@ -22,6 +22,8 @@ Async Code Runner for Neovim
     - [range](#range)
     - [transform](#transform)
 - [APIs](#apis)
+- [Self-Promotion](#self-promotion)
+- [License](#license)
 
 <!-- vim-markdown-toc -->
 
@@ -158,3 +160,15 @@ require('code-runner').setup({
 - `close()`: close code runner window
 - `get(ft)`: get default runner for specific filetype
 - `get(ft)`: get default runner for specific filetype
+
+## Self-Promotion
+
+Like this plugin? Star the repository on
+GitHub.
+
+Love this plugin? Follow [me](https://wsdjeg.net/) on
+[GitHub](https://github.com/wsdjeg).
+
+## License
+
+This project is licensed under the GPL-3.0 License.

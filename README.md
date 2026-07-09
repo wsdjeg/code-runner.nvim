@@ -2,12 +2,12 @@
 
 Async Code Runner for Neovim
 
+[![Run Tests](https://github.com/wsdjeg/code-runner.nvim/actions/workflows/test.yml/badge.svg)](https://github.com/wsdjeg/code-runner.nvim/actions/workflows/test.yml)
 [![GitHub License](https://img.shields.io/github/license/wsdjeg/code-runner.nvim)](LICENSE)
 [![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/wsdjeg/code-runner.nvim)](https://github.com/wsdjeg/code-runner.nvim/issues)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/wsdjeg/code-runner.nvim)](https://github.com/wsdjeg/code-runner.nvim/commits/master/)
 [![GitHub Release](https://img.shields.io/github/v/release/wsdjeg/code-runner.nvim)](https://github.com/wsdjeg/code-runner.nvim/releases)
 [![luarocks](https://img.shields.io/luarocks/v/wsdjeg/code-runner.nvim)](https://luarocks.org/modules/wsdjeg/code-runner.nvim)
-[![CI](https://github.com/wsdjeg/code-runner.nvim/actions/workflows/test.yml/badge.svg)](https://github.com/wsdjeg/code-runner.nvim/actions/workflows/test.yml)
 
 ![Image](https://github.com/user-attachments/assets/e8a3d6e8-59ee-41b1-bb19-be0a1d3d997f)
 

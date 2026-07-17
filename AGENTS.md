@@ -31,7 +31,8 @@ Three types, use `@extract_memory` to store and `@recall_memory` to recall:
 2. Edit in reply                          # Modify what's needed
 3. @write_file action="overwrite"         # Write complete content
 4. @read_file filepath="target"           # Verify: check syntax, duplicates, correctness
-5. @git_add -> @git_commit -> @git_push   # One at a time, wait for each result
+5. @make target="test"                    # Run tests - MUST pass before committing
+6. @git_add -> @git_commit -> @git_push   # One at a time, wait for each result
 ```
 
 ### Git tools: one at a time
@@ -45,10 +46,10 @@ Never batch git calls. Send `@git_add`, wait for result, then `@git_commit`, wai
 After any code change, auto-execute without asking:
 
 ```
-Modify -> Verify -> git_add -> git_commit -> git_push -> Done
+Modify -> Verify -> make test -> git_add -> git_commit -> git_push -> Done
 ```
 
-**Never:** skip verification, read only partial file, modify without commit, commit without push.
+**Never:** skip verification, skip tests, read only partial file, modify without commit, commit without push.
 
 ---
 
@@ -79,6 +80,29 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/). Format: `ty
 \* Unless `BREAKING CHANGE` footer or `Release-As` is set.
 
 **Rules:** imperative mood, lowercase, no period, under 72 chars. Use `!` for breaking: `refactor!: change API`.
+
+---
+
+## Release
+
+Release-please creates a PR on branch `release-please--branches--master`. To re-trigger or fix the release PR version, use git tools one at a time:
+
+1. `@git_fetch remote="origin"` - fetch latest from origin
+2. `@git_checkout branch="release-please--branches--master"` - switch to release PR branch
+3. `@git_reset commit="origin/release-please--branches--master" mode="hard"` - reset to remote release branch state
+4. `@git_rebase branch="master"` - rebase release PR branch onto latest master
+5. `@git_push branch="release-please--branches--master" force=true` - force push to update PR
+6. `@git_checkout branch="master"` - switch back to master
+7. `@git_merge branch="release-please--branches--master"` - merge release PR into master
+
+### 禁止手动创建或推送 tags
+
+Release-please 在 release PR 合并后会**自动创建** git tags 和 GitHub Releases。在此过程中：
+
+- **不要**使用 `@git_tag` 创建任何 tag
+- **不要**使用 `@git_push tags=true` 推送 tags
+
+手动 tag 会与 release-please 的自动化冲突，导致版本混乱或重复 release。
 
 ---
 
@@ -145,15 +169,15 @@ require("code-runner").setup({
 
 The `open()` function accepts three runner formats:
 
-1. **String** — `vim.fn.printf` format, `%s` is replaced with current file path
-2. **Table with exe/opt** — `{ exe = "lua", opt = { "-" }, usestdin = true }`
+1. **String** - `vim.fn.printf` format, `%s` is replaced with current file path
+2. **Table with exe/opt** - `{ exe = "lua", opt = { "-" }, usestdin = true }`
    - `exe`: string, table, or function (returns command)
    - `opt`: arguments appended to command
    - `usestdin`: pipe buffer content as stdin instead of passing file path
    - `range`: `{ start, end }` line range for stdin (default `{ 1, '$' }`)
    - `transform`: function to transform output lines
    - `encoding`: output encoding override
-3. **Two-step table** — `{ compile_spec, run_target }` for compile-then-run workflows
+3. **Two-step table** - `{ compile_spec, run_target }` for compile-then-run workflows
 
 ### APIs
 
@@ -187,13 +211,24 @@ code-runner.nvim/
 │   └── logger.lua                        # derived logger (info/debug/warn/error)
 ├── syntax/
 │   └── nvim-code-runner.vim              # syntax highlighting for runner output buffer
+├── test/
+│   ├── minimal_init.lua                  # headless test config
+│   ├── run.lua                           # luaunit test runner
+│   ├── install_deps.lua                  # cross-platform dependency installer
+│   ├── *_spec.lua                        # test files
+│   └── .deps/                            # downloaded deps (gitignored)
 ├── .github/workflows/
+│   ├── test.yml                          # CI test matrix
 │   ├── luarocks.yml                      # upload to luarocks on tag push
 │   └── release-please.yml                # auto changelog + release on master push
+├── .github/
+│   ├── release-please-config.json        # release-please config
+│   └── release-please-manifest.json      # release-please version manifest
 ├── .stylua.toml                          # StyLua formatter config
 ├── README.md
 ├── LICENSE                               # GPL-3.0
 ├── AGENTS.md
+├── Makefile                              # test entry point
 └── CHANGELOG.md                          # Auto-generated, DO NOT EDIT
 ```
 
@@ -203,13 +238,64 @@ code-runner.nvim/
 
 - Lua 5.1 / LuaJIT compatible (Neovim runtime)
 - Use `vim.api`, `vim.fn`, `vim.schedule` for Neovim APIs
-- Use `job.nvim` API (`job.start`, `job.stop`, `job.send`) for async execution — NOT `vim.system()` or `vim.fn.jobstart`
+- Use `job.nvim` API (`job.start`, `job.stop`, `job.send`) for async execution - NOT `vim.system()` or `vim.fn.jobstart`
 - Use `vim.keymap.set` for key mappings
-- Use `vim.api.nvim_set_option_value()` with scope table (Neovim 0.10+ API) — NOT `vim.opt` or `vim.o` for buffer/window options
+- Use `vim.api.nvim_set_option_value()` with scope table (Neovim 0.10+ API) - NOT `vim.opt` or `vim.o` for buffer/window options
 - Error handling: use `pcall` for external calls, `vim.notify` for user messages
 - No global variables; use module-level `local`
 - StyLua formatting: 4 spaces, 100 columns, single quotes
-- GPL-3.0 licensed — all contributions must be GPL-3.0 compatible
+- GPL-3.0 licensed - all contributions must be GPL-3.0 compatible
+
+---
+
+## Testing
+
+Framework: **luaunit**. Files: `test/*_spec.lua`.
+
+### Running tests
+
+Run all tests:
+
+```
+@make target="test"
+```
+
+Run specific test file(s) with PATTERN:
+
+```
+@make target="test" args=["PATTERN=utils"]
+```
+
+PATTERN supports shorthand - `utils` expands to `test/**/*utils*_spec.lua`. Full paths also work:
+
+```
+@make target="test" args=["PATTERN=test/utils_spec.lua"]
+```
+
+### Writing tests
+
+```lua
+local lu = require('luaunit')
+
+TestExample = {}
+
+function TestExample:test_something()
+    lu.assertEquals(1 + 1, 2)
+end
+
+return TestExample
+```
+
+CI runs on push to main/master and PRs, across Neovim nightly/stable, ubuntu/windows/macos.
+
+### Test configuration
+
+Tests use `test/minimal_init.lua` which sets up `package.path` to include:
+1. `lua/?.lua` - Main plugin source code
+2. `test/?.lua` - Test modules
+3. `test/.deps/?.lua` - Test dependencies (luaunit, job mock, notify mock, logger mock)
+
+Dependencies are installed via `make install-deps` (or automatically before `make test`).
 
 ---
 
@@ -217,8 +303,7 @@ code-runner.nvim/
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
+| `test.yml` | Push to main/master, PR | Run test matrix (Neovim stable/nightly × ubuntu/windows/macos) |
 | `luarocks.yml` | Tag push / PR | Upload to luarocks.org (deps: `job.nvim`, `notify.nvim`) |
 | `release-please.yml` | Push to master | Auto-generate changelog and GitHub releases |
-
-No test CI exists yet. When adding tests, create `test/` directory with `*_spec.lua` files and add a test workflow.
 

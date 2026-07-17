@@ -29,7 +29,8 @@ end
 
 function TestUtils:testUnifyPathDirectory()
     -- Directory paths should end with /
-    local tmpdir = '/tmp/code_runner_test_dir'
+    -- Use vim.fn.tempname() for cross-platform compatibility
+    local tmpdir = vim.fn.tempname() .. '_code_runner_test_dir'
     vim.fn.mkdir(tmpdir, 'p')
     local result = util.unify_path(tmpdir)
     lu.assertEquals(string.sub(result, -1), '/')
